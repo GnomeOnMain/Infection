@@ -76,9 +76,6 @@ class Particle(pygame.sprite.Sprite):
         defg = int(degrees(rads))
         #setting dir to the determined degrees
         dir = pygame.math.Vector2(1, 0).rotate(defg)
-        print(dir)
-        print(velocity)
-        print(self.pos.x,self.pos.y)
     #Used to move in current direction 
     def move(self):
         #move position based on velocity and angle
