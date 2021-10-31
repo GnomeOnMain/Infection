@@ -1,6 +1,8 @@
 #Imports
 import random
 import pygame
+import math
+from math import atan2, degrees, pi
 #Create the particles
 class Particle(pygame.sprite.Sprite):
     #for when it initilizes
@@ -44,6 +46,40 @@ class Particle(pygame.sprite.Sprite):
             self.image.fill(0)
             #reset the sprite so it is now displayed as red
             pygame.draw.circle(self.image, color, (self.radius, self.radius), self.radius)
+    #used to "chase" after the nearest green particle
+    def chase(self):
+        #gets current position
+        #sets pos to current position
+        pos = self.pos
+        #used to determine if first iteration
+        z =0
+        #loop through all particles
+        q=0
+        for e in all_particles:
+            #if not a zombie, then tempP = e
+            if (e.hue == 90):
+                q+=1
+                #if the first loop, set enemy to e
+                if (z==0):
+                    enemy = e
+                    z+=1
+                #if not the first loop
+                else:
+                    #If the distance to the newest sprite selected is less than the stored value, set the newsest sprite as the stored value
+                    if (pos.distance_to(pygame.math.Vector2(e.pos.x, e.pos.y)) < pos.distance_to(pygame.math.Vector2(enemy.pos.x, enemy.pos.y))):
+                        enemy = e
+        if q !=0:
+            #determining the difference between the two points for x & y
+            difx = enemy.pos.x - self.pos.x 
+            dify = enemy.pos.y - self.pos.y 
+            #determining radians from the difference of two points for x & y
+            rads = atan2(dify,difx)
+            #converting to integer version in degrees
+            rads %=2*pi
+            defg = degrees(rads)
+            #setting dir to the determined degrees
+            self.dir = pygame.math.Vector2(1, 0).rotate((defg))
+        
     #Used to move in current direction 
     def move(self):
         #move position based on velocity and angle
@@ -66,6 +102,9 @@ class Particle(pygame.sprite.Sprite):
             self.pos.y = border_rect.bottom - self.radius
             self.dir.y = -abs(self.dir.y) 
         self.rect = self.image.get_rect(center = (round(self.pos.x), round(self.pos.y)))
+
+
+        
 #initilize pygame
 pygame.init()
 #draw the window 800pix by 800
@@ -97,7 +136,7 @@ while p <100:
     if p == 99:
         #defines last particle as zombie
         ZTF = True
-        particle = Particle(350, (x, y), radius, dir, velocity, ZTF)
+        particle = Particle(350, (0, 0), radius, dir, 1.5, ZTF)
     else:
         #defines all others as regular
         ZTF = False
@@ -113,8 +152,10 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-    #Moves all the particles        
+    #Moves all the particles, and calls chase if it is a zombie
     for particle in all_particles:
+        if particle.hue == 350:
+            particle.chase()
         particle.move()
     #sets list of all sprites
     particle_list = all_particles.sprites()
@@ -127,9 +168,10 @@ while run:
             if 0 < distance_vec.length_squared() < (particle_1.radius + particle_2.radius) ** 2:
                 particle_1.dir.reflect_ip(distance_vec)
                 particle_2.dir.reflect_ip(distance_vec)
-                # if one is a zombie and the other is not, make the 
+                # if one is a zombie and the other is not, make the
                 if (particle_1.hue == 90 and particle_2.hue == 350):
                     particle_1.ToZ
+                    particle.vel = 1
                     particle_1.changeColor(hue)
                 elif (particle_1.hue == 350 and particle_2.hue == 90):
                     particle_2.ToZ
