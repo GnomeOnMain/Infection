@@ -79,7 +79,6 @@ class Particle(pygame.sprite.Sprite):
             defg = degrees(rads)
             #setting dir to the determined degrees
             self.dir = pygame.math.Vector2(1, 0).rotate((defg))
-        
     #Used to move in current direction 
     def move(self):
         #move position based on velocity and angle
@@ -102,9 +101,6 @@ class Particle(pygame.sprite.Sprite):
             self.pos.y = border_rect.bottom - self.radius
             self.dir.y = -abs(self.dir.y) 
         self.rect = self.image.get_rect(center = (round(self.pos.x), round(self.pos.y)))
-
-
-        
 #initilize pygame
 pygame.init()
 #draw the window 800pix by 800
@@ -136,7 +132,7 @@ while p <100:
     if p == 99:
         #defines last particle as zombie
         ZTF = True
-        particle = Particle(350, (0, 0), radius, dir, 1.5, ZTF)
+        particle = Particle(350, (x, y), radius, dir, velocity, ZTF)
     else:
         #defines all others as regular
         ZTF = False
