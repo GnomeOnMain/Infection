@@ -68,6 +68,8 @@ class Particle(pygame.sprite.Sprite):
                     #If the distance to the newest sprite selected is less than the stored value, set the newsest sprite as the stored value
                     if (pos.distance_to(pygame.math.Vector2(e.pos.x, e.pos.y)) < pos.distance_to(pygame.math.Vector2(enemy.pos.x, enemy.pos.y))):
                         enemy = e
+        #sets up list of particles
+        particle_list = all_particles.sprites()
         if q !=0:
             #determining the difference between the two points for x & y
             difx = enemy.pos.x - self.pos.x 
@@ -79,11 +81,24 @@ class Particle(pygame.sprite.Sprite):
             defg = degrees(rads)
             #setting dir to the determined degrees
             self.dir = pygame.math.Vector2(1, 0).rotate((defg))
+            #for all the particles in the list
+        for particle_2 in particle_list:
+            #set the distance between the two particles to the vector between them
+            distanceBetween = pos.distance_to(pygame.math.Vector2(particle_2.pos.x, particle_2.pos.y))
+            #setup the combined hitbox size
+            combinedHitbox = self.radius + particle_2.radius
+            #if they're overlapping, set them apart
+            if combinedHitbox > distanceBetween:
+                # Calculate the delta position (difference between)
+                positionDiff = particle_2.pos - self.pos
+                # Move them away from each other half of the distance between them.                    particle_2.pos += positionDiff /2
+                self.pos -= positionDiff /2
+
     #Used to move in current direction 
     def move(self):
         #move position based on velocity and angle
         self.pos += self.dir * self.vel
-        #Used to set ZTF to true because for some reason I get an error if I just try and do particle_1.ZTF = True
+    #Used to set ZTF to true because for some reason I get an error if I just try and do particle_1.ZTF = True
     def ToZ():
         ZTF = True
     #used to change the angle of movement in the event of a collision with the border
