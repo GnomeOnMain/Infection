@@ -82,6 +82,18 @@ class Particle(pygame.sprite.Sprite):
             #setting dir to the determined degrees
             self.dir = pygame.math.Vector2(1, 0).rotate((defg))
             #for all the particles in the list
+        for particle_2 in particle_list:
+            #set the distance between the two particles to the vector between them
+            distanceBetween = pos.distance_to(pygame.math.Vector2(particle_2.pos.x, particle_2.pos.y))
+            #setup the combined hitbox size
+            combinedHitbox = self.radius + particle_2.radius
+            #if they're overlapping, set them apart
+            if combinedHitbox > distanceBetween:
+                # Calculate the delta position (difference between)
+                positionDiff = particle_2.pos - self.pos
+                # Move them away from each other half of the distance between them.                    particle_2.pos += positionDiff /2
+                self.pos -= positionDiff /2
+
     #Used to move in current direction 
     def move(self):
         #move position based on velocity and angle
@@ -106,8 +118,11 @@ class Particle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = (round(self.pos.x), round(self.pos.y)))
 #initilize pygame
 pygame.init()
-#draw the window 800pix by 800
-window = pygame.display.set_mode((800, 800))
+#draw the window
+INF = pygame.display.Info()
+WID = INF.current_w
+HEI = INF.current_h
+window = pygame.display.set_mode((WID, HEI))
 #begin the clock
 clock = pygame.time.Clock()
 #draw the rectangle bounds
@@ -115,7 +130,7 @@ rect_area = window.get_rect().inflate(-40, -40)
 #setup the particle group
 all_particles = pygame.sprite.Group()
 #setting radius and velocity for sprites
-radius, velocity = 5, 1
+radius, velocity = 3, 1
 #setting up pos_rect
 pos_rect = rect_area.inflate(-radius * 2, -radius * 2)
 #create hue
@@ -126,7 +141,7 @@ run = True
 #spawn in the particles
 p =0
 #loop which runs while there are below x num of particles
-while p <100:
+while p <200:
     #random coords for spawning, and random angle for movement
     x = random.randrange(pos_rect.left, pos_rect.right)
     y = random.randrange(pos_rect.top, pos_rect.bottom)
@@ -165,16 +180,6 @@ while run:
             distance_vec = particle_1.pos - particle_2.pos
             #if they do collide, then make them bounce off eachother
             if 0 < distance_vec.length_squared() < (particle_1.radius + particle_2.radius) ** 2:
-                distanceBetween = particle_1.pos.distance_to(pygame.math.Vector2(particle_2.pos.x, particle_2.pos.y))
-                #setup the combined hitbox size
-                combinedHitbox = particle_1.radius + particle_2.radius
-                #if they're overlapping, set them apart
-                if combinedHitbox > distanceBetween:
-                    # Calculate the delta position (difference between)
-                    positionDiff = particle_2.pos - particle_1.pos
-                    # Move them away from each other half of the distance between them.
-                    particle_2.pos += positionDiff /2
-                    particle_1.pos -= positionDiff /2
                 particle_1.dir.reflect_ip(distance_vec)
                 particle_2.dir.reflect_ip(distance_vec)
                 # if one is a zombie and the other is not, make the
